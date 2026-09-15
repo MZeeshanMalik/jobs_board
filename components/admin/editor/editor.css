@@ -1,0 +1,279 @@
+.editor-shell {
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  background: #fff;
+  max-width: 760px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px;
+  border-bottom: 1px solid #e2e2e2;
+  flex-wrap: wrap;
+  background: #fafafa;
+  border-radius: 8px 8px 0 0;
+}
+
+.toolbar-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #333;
+}
+
+.toolbar-item:hover {
+  background: #eee;
+}
+
+.toolbar-item.active {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.toolbar-item:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.divider {
+  width: 1px;
+  height: 22px;
+  background: #ddd;
+  margin: 0 4px;
+}
+
+.table-toolbar {
+  border-radius: 0;
+  border-top: none;
+  border-bottom: 1px solid #e2e2e2;
+  background: #f0f5ff;
+  padding: 6px 8px;
+}
+
+.table-toolbar-label {
+  font-size: 12px;
+  color: #666;
+  margin: 0 4px 0 6px;
+  white-space: nowrap;
+}
+
+.table-toolbar .toolbar-item {
+  width: auto;
+  padding: 0 6px;
+  gap: 4px;
+}
+
+.table-toolbar-text {
+  font-size: 12px;
+}
+
+.table-color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  padding: 0;
+}
+
+.table-toolbar-inline-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #444;
+  margin: 0 6px;
+}
+
+.table-toolbar-input {
+  width: 52px;
+  padding: 3px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.table-toolbar-confirm-btn {
+  padding: 5px 14px;
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+.table-toolbar-confirm-btn:hover {
+  background: #1e40af;
+}
+
+.editor-container {
+  position: relative;
+  padding: 16px;
+  min-height: 320px;
+}
+
+.editor-input {
+  min-height: 300px;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1a1a1a;
+}
+
+.editor-placeholder {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: #999;
+  pointer-events: none;
+  font-size: 15px;
+}
+
+.editor-footer {
+  padding: 8px 16px;
+  border-top: 1px solid #eee;
+  font-size: 12px;
+  color: #888;
+}
+
+/* Typography */
+.editor-h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 20px 0 10px;
+}
+.editor-h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+}
+.editor-h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+}
+.editor-paragraph {
+  margin: 0 0 10px;
+}
+.editor-quote {
+  border-left: 3px solid #ccc;
+  padding-left: 12px;
+  margin: 10px 0;
+  color: #555;
+  font-style: italic;
+}
+
+.editor-list-ul {
+  margin: 8px 0;
+  padding-left: 24px;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+.editor-list-ol {
+  margin: 8px 0;
+  padding-left: 24px;
+  list-style-type: decimal;
+  list-style-position: outside;
+}
+.editor-listitem {
+  margin: 4px 0;
+  list-style: inherit;
+}
+/* Nested unordered lists cycle through bullet styles like most editors */
+.editor-list-ul .editor-list-ul {
+  list-style-type: circle;
+}
+.editor-list-ul .editor-list-ul .editor-list-ul {
+  list-style-type: square;
+}
+.editor-nested-listitem {
+  list-style: none;
+}
+.editor-nested-listitem::before,
+.editor-nested-listitem::after {
+  display: none;
+}
+
+.editor-link {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.editor-text-bold {
+  font-weight: 700;
+}
+.editor-text-italic {
+  font-style: italic;
+}
+.editor-text-underline {
+  text-decoration: underline;
+}
+.editor-text-strikethrough {
+  text-decoration: line-through;
+}
+.editor-text-underline-strikethrough {
+  text-decoration: underline line-through;
+}
+.editor-text-code {
+  background: #f1f1f1;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.editor-code {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  display: block;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-family: "Fira Code", monospace;
+  font-size: 13px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.editor-table {
+  border-collapse: collapse;
+  margin: 12px 0;
+  table-layout: fixed;
+  width: auto;
+}
+.editor-tableCell,
+.editor-tableCellHeader {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  position: relative;
+  min-width: 60px;
+  vertical-align: top;
+}
+.editor-tableCellHeader {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+.editor-tableScrollableWrapper {
+  overflow-x: auto;
+  margin: 12px 0;
+}
+.editor-tableScrollableWrapper .editor-table {
+  margin: 0;
+}
+
+.editor-image img {
+  border-radius: 6px;
+  margin: 10px 0;
+}
