@@ -75,6 +75,21 @@ function getBaseUrl(): string {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
+
+function getApiHeaders(): HeadersInit {
+  const headers: Record<string, string> = { Accept: "application/json" };
+
+  // Keep the Vercel bypass secret server-only. Never expose it to browser code.
+  if (
+    typeof window === "undefined" &&
+    process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+  ) {
+    headers["x-vercel-protection-bypass"] =
+      process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+  }
+
+  return headers;
+}
 // export async function fetchJobBySlug(slug: string): Promise<JobPost | null> {
 //   const url = `${getBaseUrl()}/api/jobs/${encodeURIComponent(slug)}`;
 //   const res = await fetch(url);
@@ -98,11 +113,7 @@ function getBaseUrl(): string {
 // }
 export async function fetchJobBySlug(slug: string): Promise<JobPost | null> {
   const url = `${getBaseUrl()}/api/jobs/${encodeURIComponent(slug)}`;
-  console.log(url);
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-  });
-  console.log(res);
+  const res = await fetch(url, { headers: getApiHeaders() });
 
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Failed to fetch job (${res.status})`);
@@ -128,7 +139,7 @@ export async function fetchJobs(
   params: JobsQueryParams = {},
 ): Promise<JobsResponse> {
   const url = `${API_URL}/api/jobs${buildQuery(params)}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: getApiHeaders() });
   if (!res.ok) {
     const error = new Error("Request failed") as Error & { status?: number };
     error.status = res.status;
@@ -152,7 +163,7 @@ export async function fetchJobs(
 
 export async function fetchFeaturedJobs(limit = 5): Promise<JobPost[]> {
   const url = `${getBaseUrl()}/api/jobs?status=published&isActive=true&page=1&limit=${limit}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: getApiHeaders() });
   if (!res.ok) throw new Error("Failed to fetch featured jobs");
 
   const json = await res.json();
