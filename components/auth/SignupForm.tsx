@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { Input } from "../ui/Input";
-import { Button } from "../ui/Button";
-import PhoneInput from "../tools/PhoneInput";
+import { Button } from "../ui/button";
+// import PhoneInput from "../tools/PhoneInput";
 
 interface Country {
   code: string;
@@ -258,16 +258,16 @@ export function SignupForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        {/* <label className="block text-sm font-medium text-gray-700 mb-1.5">
           Phone number <span className="text-red-500">*</span>
-        </label>
-        <PhoneInput
+        </label> */}
+        {/* <PhoneInput
           countries={countries}
           selectedCountry={selectedCountry}
           onCountryChange={setSelectedCountry}
           phoneNumber={phoneNumber}
           onPhoneChange={setPhoneNumber}
-        />
+        /> */}
         {errors.phone && (
           <p className="text-xs text-red-600 mt-1">{errors.phone}</p>
         )}
@@ -310,9 +310,8 @@ export function SignupForm() {
 
       <Button
         type="submit"
-        fullWidth
-        loading={signupMutation.isPending}
-        className="mt-2"
+        disabled={signupMutation.isPending}
+        className="mt-2 w-full"
       >
         Create account
       </Button>
