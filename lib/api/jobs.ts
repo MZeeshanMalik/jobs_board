@@ -98,9 +98,11 @@ function getBaseUrl(): string {
 // }
 export async function fetchJobBySlug(slug: string): Promise<JobPost | null> {
   const url = `${getBaseUrl()}/api/jobs/${encodeURIComponent(slug)}`;
+  console.log(url);
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
   });
+  console.log(res);
 
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Failed to fetch job (${res.status})`);
