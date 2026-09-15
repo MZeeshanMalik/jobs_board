@@ -84,15 +84,41 @@ function getBaseUrl(): string {
 //   return res.json();
 // }
 
+// export async function fetchJobBySlug(slug: string): Promise<JobPost | null> {
+//   const url = `${getBaseUrl()}/api/jobs/${encodeURIComponent(slug)}`;
+//   const res = await fetch(url);
+//   if (res.status === 404) return null;
+//   if (!res.ok) throw new Error("Failed to fetch job");
+
+//   const json = await res.json();
+
+//   // API returns: { success: true, data: JobPost }
+//   if (!json?.success || !json.data) return null;
+//   return json.data as JobPost;
+// }
 export async function fetchJobBySlug(slug: string): Promise<JobPost | null> {
   const url = `${getBaseUrl()}/api/jobs/${encodeURIComponent(slug)}`;
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+  });
+
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Failed to fetch job");
+  if (!res.ok) throw new Error(`Failed to fetch job (${res.status})`);
+
+  // Guard: only parse JSON if the response is actually JSON
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    const text = await res.text();
+    console.error("[fetchJobBySlug] non-JSON response:", {
+      url,
+      status: res.status,
+      contentType,
+      preview: text.slice(0, 200),
+    });
+    throw new Error("Unexpected non-JSON response from API");
+  }
 
   const json = await res.json();
-
-  // API returns: { success: true, data: JobPost }
   if (!json?.success || !json.data) return null;
   return json.data as JobPost;
 }
