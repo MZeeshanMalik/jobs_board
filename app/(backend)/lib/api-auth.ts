@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/(backend)/lib/mongodb";
 import User from "@/app/(backend)/models/User";
-import { usageTracker } from "./usage-tracker";
 import { AVAILABLE_TOOLS, ToolId } from "./plans";
 
 export interface ApiAuthenticatedRequest extends NextRequest {
@@ -117,48 +116,15 @@ export async function withApiAuthAndUsage(
       );
     }
 
-    // ✅ Check usage limits
-    const usageCheck = await usageTracker.checkUsage(authResult.user.id, tool);
-    if (!usageCheck.allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: usageCheck.message,
-          code: "USAGE_LIMIT_EXCEEDED",
-          data: {
-            tool,
-            remaining: 0,
-            limit: usageCheck.limit,
-            resetDate: usageCheck.resetDate,
-            upgradeUrl: "/pricing",
-          },
-        },
-        { status: 429 },
-      );
-    }
-
-    // ✅ Increment usage
-    await usageTracker.incrementUsage(authResult.user.id, tool);
-
     // ✅ Attach user to request
     (req as ApiAuthenticatedRequest).user = authResult.user;
 
     // ✅ Execute handler
     const response = await handler(req as ApiAuthenticatedRequest);
 
-    // ✅ Add usage headers to response
-    const usageResult = await usageTracker.getUsage(authResult.user.id, tool);
-    const headers = new Headers(response.headers);
-    headers.set("X-Usage-Remaining", usageResult.remaining.toString());
-    headers.set("X-Usage-Limit", usageResult.limit.toString());
-    headers.set("X-Usage-Used", usageResult.used.toString());
-    headers.set("X-Reset-Date", usageResult.resetDate.toISOString());
-    headers.set("X-User-Id", authResult.user.id);
-
     return new NextResponse(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers,
     });
   } catch (error: any) {
     console.error("API auth error:", error);

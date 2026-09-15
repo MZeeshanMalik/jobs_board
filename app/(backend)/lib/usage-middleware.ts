@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // lib/usage-middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import { usageTracker } from "./usage-tracker";
 import { verifyToken } from "./jwt";
 import { ToolId } from "./plans";
 
@@ -42,28 +41,6 @@ export async function withUsageTracking(
       );
     }
 
-    // Check if user has remaining requests
-    const usageCheck = await usageTracker.checkUsage(payload.id, tool);
-
-    if (!usageCheck.allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: usageCheck.message,
-          data: {
-            remaining: 0,
-            limit: usageCheck.limit,
-            resetDate: usageCheck.resetDate,
-            upgradeUrl: "/pricing",
-          },
-        },
-        { status: 429 }, // Too Many Requests
-      );
-    }
-
-    // Increment usage
-    await usageTracker.incrementUsage(payload.id, tool);
-
     // Attach user to request
     req.user = {
       id: payload.id,
@@ -75,16 +52,10 @@ export async function withUsageTracking(
     const response = await handler(req);
 
     // Add usage headers to response
-    const usageResult = await usageTracker.getUsage(payload.id, tool);
-    const headers = new Headers(response.headers);
-    headers.set("X-Usage-Remaining", usageResult.remaining.toString());
-    headers.set("X-Usage-Limit", usageResult.limit.toString());
-    headers.set("X-Reset-Date", usageResult.resetDate.toISOString());
 
     return new NextResponse(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers,
     });
   } catch (error: any) {
     console.error("Usage tracking error:", error);
