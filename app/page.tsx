@@ -11,9 +11,9 @@ import { fetchFeaturedJobs } from "@/lib/api/jobs";
 import { homeJobKeys } from "@/lib/api/query-keys";
 
 export const metadata: Metadata = {
-  title: "Find Your Dream Job in Pakistan",
+  title: "Latest Jobs in Pakistan | Find Jobs & Career Opportunities",
   description:
-    "Discover the latest job opportunities from top companies across Pakistan. Browse engineering, design, marketing, and remote roles on JobBoard.",
+    "Find the latest jobs in Pakistan from top companies. Explore private jobs, IT jobs, remote jobs, and career opportunities in Lahore, Karachi, Islamabad, and across Pakistan.",
   keywords: [
     "jobs in Pakistan",
     "Pakistani job board",
@@ -25,9 +25,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Find Your Dream Job in Pakistan",
+    title: "Latest Jobs in Pakistan | Find Jobs & Career Opportunities",
     description:
-      "Discover the latest job opportunities from top companies across Pakistan.",
+      "Find the latest jobs in Pakistan from top companies. Explore private jobs, IT jobs, remote jobs, and career opportunities across Pakistan.",
     type: "website",
     url: "/",
   },
