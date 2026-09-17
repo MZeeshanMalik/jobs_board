@@ -1,63 +1,19 @@
-import { MetadataRoute } from "next";
+// app/sitemap.ts
+import type { MetadataRoute } from "next";
+import { connectDB } from "./(backend)/lib/mongodb";
+import JobPost from "./(backend)/models/JobPost";
+// import connectDB from "@/lib/db";
+// import JobPost from "@/models/JobPost";
 
 const BASE_URL = "https://www.fraudhawkai.com";
-const API_BASE = "https://www.fraudhawkai.com/api/jobs";
-const PAGE_LIMIT = 100; // pull bigger pages from your API to cut request count
 
-interface Job {
-  slug: string;
-  datePosted: string;
-  validThrough: string;
-  isActive: boolean;
-  status: string;
-}
+// Regenerate at most once every 10 minutes
+export const revalidate = 600;
 
-interface JobsResponse {
-  success: boolean;
-  data: Job[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNextPage: boolean;
-  };
-}
-
-async function getAllActiveJobs(): Promise<Job[]> {
-  const allJobs: Job[] = [];
-  let page = 1;
-  let hasNextPage = true;
-
-  while (hasNextPage) {
-    const res = await fetch(
-      `${API_BASE}?page=${page}&limit=${PAGE_LIMIT}&status=published&isActive=true`,
-      { next: { revalidate: 3600 } }, // cache each page for 1 hour
-    );
-
-    if (!res.ok) break;
-
-    const json: JobsResponse = await res.json();
-    allJobs.push(...json.data);
-
-    hasNextPage = json.pagination.hasNextPage;
-    page++;
-  }
-
-  // Belt-and-suspenders filter in case the API ever returns something stale
-  return allJobs.filter((job) => job.status === "published" && job.isActive);
-}
+// Force dynamic so it's evaluated at request time, not build time
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const jobs = await getAllActiveJobs();
-
-  const jobUrls: MetadataRoute.Sitemap = jobs.map((job) => ({
-    url: `${BASE_URL}/jobs/${job.slug}`,
-    lastModified: new Date(job.datePosted),
-    changeFrequency: "daily",
-    priority: 0.8,
-  }));
-
   const staticUrls: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
@@ -71,7 +27,66 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly",
       priority: 0.9,
     },
+    {
+      url: `${BASE_URL}/companies`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/about`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/terms`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/cookies`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 
-  return [...staticUrls, ...jobUrls];
+  try {
+    await connectDB();
+
+    const jobs = await JobPost.find(
+      { status: "published", isActive: true },
+      { slug: 1, datePosted: 1, updatedAt: 1 },
+    )
+      .sort({ datePosted: -1 })
+      .lean();
+
+    const jobUrls: MetadataRoute.Sitemap = jobs.map((job) => ({
+      url: `${BASE_URL}/jobs/${job.slug}`,
+      lastModified: job.updatedAt ?? job.datePosted ?? new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    }));
+
+    console.log(`[sitemap] generated ${jobUrls.length} job URLs`);
+
+    return [...staticUrls, ...jobUrls];
+  } catch (err) {
+    console.error("[sitemap] DB query failed:", err);
+    return staticUrls;
+  }
 }
